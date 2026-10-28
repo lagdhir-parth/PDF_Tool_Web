@@ -1,0 +1,185 @@
+{
+  "communities": {
+    "0": [
+      "client_tsconfig_app",
+      "client_tsconfig_app_compileroptions",
+      "client_tsconfig_app_compileroptions_allowarbitraryextensions",
+      "client_tsconfig_app_compileroptions_allowimportingtsextensions",
+      "client_tsconfig_app_compileroptions_erasablesyntaxonly",
+      "client_tsconfig_app_compileroptions_jsx",
+      "client_tsconfig_app_compileroptions_lib",
+      "client_tsconfig_app_compileroptions_module",
+      "client_tsconfig_app_compileroptions_moduledetection",
+      "client_tsconfig_app_compileroptions_moduleresolution",
+      "client_tsconfig_app_compileroptions_noemit",
+      "client_tsconfig_app_compileroptions_nofallthroughcasesinswitch",
+      "client_tsconfig_app_compileroptions_nounusedlocals",
+      "client_tsconfig_app_compileroptions_nounusedparameters",
+      "client_tsconfig_app_compileroptions_skiplibcheck",
+      "client_tsconfig_app_compileroptions_target",
+      "client_tsconfig_app_compileroptions_tsbuildinfofile",
+      "client_tsconfig_app_compileroptions_types",
+      "client_tsconfig_app_compileroptions_verbatimmodulesyntax",
+      "client_tsconfig_app_include"
+    ],
+    "1": [
+      "client_tsconfig_node",
+      "client_tsconfig_node_compileroptions",
+      "client_tsconfig_node_compileroptions_allowimportingtsextensions",
+      "client_tsconfig_node_compileroptions_erasablesyntaxonly",
+      "client_tsconfig_node_compileroptions_lib",
+      "client_tsconfig_node_compileroptions_module",
+      "client_tsconfig_node_compileroptions_moduledetection",
+      "client_tsconfig_node_compileroptions_noemit",
+      "client_tsconfig_node_compileroptions_nofallthroughcasesinswitch",
+      "client_tsconfig_node_compileroptions_nounusedlocals",
+      "client_tsconfig_node_compileroptions_nounusedparameters",
+      "client_tsconfig_node_compileroptions_skiplibcheck",
+      "client_tsconfig_node_compileroptions_target",
+      "client_tsconfig_node_compileroptions_tsbuildinfofile",
+      "client_tsconfig_node_compileroptions_types",
+      "client_tsconfig_node_compileroptions_verbatimmodulesyntax",
+      "client_tsconfig_node_include"
+    ],
+    "2": [
+      "client_package_dependencies",
+      "client_package_dependencies_react",
+      "client_package_dependencies_react_dom",
+      "client_src_app",
+      "client_src_app_app",
+      "client_src_index",
+      "client_src_main",
+      "ref_react",
+      "ref_react_dom"
+    ],
+    "3": [
+      "client_eslint_config",
+      "client_package_devdependencies_eslint",
+      "client_package_devdependencies_eslint_plugin_react_refresh",
+      "client_package_devdependencies_typescript_eslint",
+      "ref_eslint",
+      "ref_eslint_plugin_react_refresh",
+      "ref_typescript_eslint"
+    ],
+    "4": [
+      "client_package",
+      "client_package_devdependencies_types_react",
+      "client_package_name",
+      "client_package_private",
+      "client_package_type",
+      "client_package_version",
+      "ref_types_react"
+    ],
+    "5": [
+      "client_package_devdependencies",
+      "client_package_devdependencies_types_node",
+      "client_package_devdependencies_types_react_dom",
+      "client_package_devdependencies_typescript",
+      "ref_types_node",
+      "ref_types_react_dom",
+      "ref_typescript"
+    ],
+    "6": [
+      "client_package_devdependencies_vite",
+      "client_package_devdependencies_vitejs_plugin_react",
+      "client_vite_config",
+      "ref_vite",
+      "ref_vitejs_plugin_react"
+    ],
+    "7": [
+      "client_package_scripts",
+      "client_package_scripts_build",
+      "client_package_scripts_dev",
+      "client_package_scripts_lint",
+      "client_package_scripts_preview"
+    ],
+    "8": [
+      "client_tsconfig",
+      "client_tsconfig_files",
+      "client_tsconfig_references"
+    ],
+    "9": [
+      "client_package_devdependencies_eslint_js",
+      "ref_eslint_js"
+    ],
+    "10": [
+      "client_package_devdependencies_eslint_plugin_react_hooks",
+      "ref_eslint_plugin_react_hooks"
+    ],
+    "11": [
+      "client_package_devdependencies_globals",
+      "ref_globals"
+    ]
+  },
+  "cohesion": {
+    "0": 0.1,
+    "1": 0.11764705882352941,
+    "2": 0.2777777777777778,
+    "3": 0.2857142857142857,
+    "4": 0.2857142857142857,
+    "5": 0.2857142857142857,
+    "6": 0.4,
+    "7": 0.4,
+    "8": 0.6666666666666666,
+    "9": 1.0,
+    "10": 1.0,
+    "11": 1.0
+  },
+  "gods": [
+    {
+      "id": "client_tsconfig_app_compileroptions",
+      "label": "compilerOptions",
+      "degree": 18
+    },
+    {
+      "id": "client_tsconfig_node_compileroptions",
+      "label": "compilerOptions",
+      "degree": 15
+    },
+    {
+      "id": "client_package_scripts",
+      "label": "scripts",
+      "degree": 5
+    },
+    {
+      "id": "ref_react",
+      "label": "react",
+      "degree": 3
+    },
+    {
+      "id": "ref_react_dom",
+      "label": "react-dom",
+      "degree": 3
+    },
+    {
+      "id": "ref_eslint_js",
+      "label": "@eslint/js",
+      "degree": 3
+    },
+    {
+      "id": "ref_vitejs_plugin_react",
+      "label": "@vitejs/plugin-react",
+      "degree": 3
+    },
+    {
+      "id": "ref_eslint",
+      "label": "eslint",
+      "degree": 3
+    },
+    {
+      "id": "ref_eslint_plugin_react_hooks",
+      "label": "eslint-plugin-react-hooks",
+      "degree": 3
+    },
+    {
+      "id": "ref_eslint_plugin_react_refresh",
+      "label": "eslint-plugin-react-refresh",
+      "degree": 3
+    }
+  ],
+  "surprises": [],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}
