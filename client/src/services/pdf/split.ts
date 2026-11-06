@@ -2,12 +2,13 @@ import { loadPdfLibDoc, createPdfDocument } from '../../lib/pdf/load';
 
 import { parsePageRangeGroups } from '../../lib/utils/page-ranges';
 
-export type SplitMode = 'all-pages' | 'custom-ranges' | 'fixed-ranges';
+export type SplitMode = 'all-pages' | 'custom-ranges' | 'fixed-ranges' | 'selected-pages';
 
 export interface SplitOptions {
   mode: SplitMode;
   customRanges?: string;
   everyNPages?: number;
+  selectedIndices?: number[];
   baseFilename?: string;
   onProgress?: (progress: number, message: string) => void;
 }
@@ -50,6 +51,14 @@ export async function splitPdf(
       throw new Error('Please enter valid page ranges (e.g., 1-3, 5-7, 9).');
     }
     groups = parsePageRangeGroups(options.customRanges, totalPages);
+  } else if (options.mode === 'selected-pages') {
+    const indices = options.selectedIndices && options.selectedIndices.length > 0
+      ? [...options.selectedIndices].sort((a, b) => a - b)
+      : [];
+    if (indices.length === 0) {
+      throw new Error('Please select at least one page from the preview grid to split.');
+    }
+    groups = [indices];
   }
 
   if (groups.length === 0) {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckSquare, Sparkles, AlertCircle } from 'lucide-react';
+import { CheckSquare, Sparkles, AlertCircle, Loader2 } from 'lucide-react';
 import { ToolLayout } from '../../components/layout/ToolLayout';
 import { FileUploader } from '../../components/common/FileUploader';
 import { Button } from '../../components/common/Button';
@@ -211,10 +211,17 @@ export const FillPdfFormsPage: React.FC = () => {
                     <Button
                       size="lg"
                       variant="primary"
-                      leftIcon={<Sparkles className="w-5 h-5" />}
+                      leftIcon={
+                        isLoadingFields ? (
+                          <Loader2 className="animate-spin w-5 h-5" />
+                        ) : (
+                          <Sparkles className="w-5 h-5" />
+                        )
+                      }
                       onClick={handleSaveForm}
+                      disabled={isLoadingFields}
                     >
-                      Save & Download PDF Form
+                      {isLoadingFields ? "Scanning Form..." : "Save & Download PDF Form"}
                     </Button>
                   </div>
                 </div>

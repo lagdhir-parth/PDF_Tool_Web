@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Scissors, Archive, Download, Sparkles } from 'lucide-react';
+import { Scissors, Archive, Download, Sparkles, CheckSquare, Square, Loader2, MousePointerClick } from 'lucide-react';
 import { ToolLayout } from '../../components/layout/ToolLayout';
 import { FileUploader } from '../../components/common/FileUploader';
 import { Button } from '../../components/common/Button';
@@ -11,15 +11,17 @@ import { splitPdf, type SplitMode, type SplitResultFile } from '../../services/p
 import { usePdfProcessing } from '../../hooks/usePdfProcessing';
 import { usePdfDocument } from '../../hooks/usePdfDocument';
 import { downloadZip, downloadBlob } from '../../lib/files/download';
+import { formatPageIndices, parsePageRange } from '../../lib/utils/page-ranges';
 
 export const SplitPdfPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [mode, setMode] = useState<SplitMode>('custom-ranges');
   const [customRanges, setCustomRanges] = useState('');
   const [everyNPages, setEveryNPages] = useState<number>(1);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [splitResults, setSplitResults] = useState<SplitResultFile[] | null>(null);
 
-  const { pages, totalPages, isLoading: isDocLoading } = usePdfDocument(file);
+  const { pages, totalPages, isLoading: isDocLoading, docProxy, docFingerprint } = usePdfDocument(file);
   const {
     isProcessing,
     progress,
@@ -35,18 +37,72 @@ export const SplitPdfPage: React.FC = () => {
     if (files.length > 0) {
       setFile(files[0]);
       setCustomRanges('');
+      setSelectedIds([]);
       setSplitResults(null);
     }
+  };
+
+  const handleToggleSelect = (id: string, isMulti?: boolean) => {
+    let nextSelected: string[];
+    if (isMulti) {
+      nextSelected = selectedIds.includes(id)
+        ? selectedIds.filter((item) => item !== id)
+        : [...selectedIds, id];
+    } else {
+      nextSelected = selectedIds.includes(id)
+        ? selectedIds.filter((item) => item !== id)
+        : [...selectedIds, id];
+    }
+
+    setSelectedIds(nextSelected);
+
+    // Synchronize selected pages into the custom ranges input
+    const selectedIndices = pages
+      .map((p, idx) => (nextSelected.includes(p.id) ? idx : -1))
+      .filter((idx) => idx !== -1);
+
+    const formattedRange = formatPageIndices(selectedIndices);
+    setCustomRanges(formattedRange);
+  };
+
+  const handleCustomRangeChange = (newRange: string) => {
+    setCustomRanges(newRange);
+    try {
+      const indices = parsePageRange(newRange, totalPages);
+      const newSelectedIds = indices
+        .map((i) => pages[i]?.id)
+        .filter(Boolean) as string[];
+      setSelectedIds(newSelectedIds);
+    } catch {
+      // Keep existing selection while typing incomplete range
+    }
+  };
+
+  const handleSelectAll = () => {
+    const allIds = pages.map((p) => p.id);
+    setSelectedIds(allIds);
+    setCustomRanges(totalPages > 0 ? `1-${totalPages}` : '');
+  };
+
+  const handleClearSelection = () => {
+    setSelectedIds([]);
+    setCustomRanges('');
   };
 
   const handleSplit = async () => {
     if (!file) return;
     try {
       startProcessing('Starting split process...');
+
+      const selectedIndices = pages
+        .filter((p) => selectedIds.includes(p.id))
+        .map((p) => p.originalPageIndex);
+
       const results = await splitPdf(file, {
         mode,
         customRanges,
         everyNPages,
+        selectedIndices,
         onProgress: updateProgress,
       });
       setSplitResults(results);
@@ -63,13 +119,14 @@ export const SplitPdfPage: React.FC = () => {
   const handleReset = () => {
     setFile(null);
     setSplitResults(null);
+    setSelectedIds([]);
     resetProcessing();
   };
 
   return (
     <ToolLayout
       title="Split PDF Pages"
-      description="Split your PDF into separate files by page ranges or individual pages."
+      description="Split your PDF into separate files by page ranges, manual page selection, or individual pages."
       icon={<Scissors className="w-5 h-5" />}
       hasFiles={!!file}
       onReset={handleReset}
@@ -82,7 +139,7 @@ export const SplitPdfPage: React.FC = () => {
 
           <div>
             <h2 className="text-2xl font-bold text-slate-900">
-              PDF Split into {splitResults.length} Files!
+              PDF Split into {splitResults.length} {splitResults.length === 1 ? 'File' : 'Files'}!
             </h2>
             <p className="text-sm text-slate-500 mt-1">
               Download individual parts or save everything in a single ZIP.
@@ -155,21 +212,42 @@ export const SplitPdfPage: React.FC = () => {
             />
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Thumbnail preview */}
+              {/* Thumbnail preview & selection grid */}
               <div className="lg:col-span-2 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-slate-800">
-                    Document Preview ({totalPages} pages)
-                  </h3>
-                  <span className="text-xs text-slate-400">
-                    {file.name}
-                  </span>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-slate-800">
+                      Document Pages ({totalPages})
+                    </h3>
+                    <span className="text-xs text-indigo-700 font-semibold bg-indigo-50 px-2.5 py-0.5 rounded-full">
+                      {selectedIds.length} selected
+                    </span>
+                  </div>
+
+                  {/* Select All / Clear selection buttons */}
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      leftIcon={selectedIds.length === pages.length ? <Square className="w-3.5 h-3.5" /> : <CheckSquare className="w-3.5 h-3.5" />}
+                      onClick={selectedIds.length === pages.length ? handleClearSelection : handleSelectAll}
+                    >
+                      {selectedIds.length === pages.length ? 'Clear Selection' : 'Select All'}
+                    </Button>
+                  </div>
                 </div>
 
-                <div className="max-h-[600px] overflow-y-auto p-2 bg-slate-100/70 rounded-3xl border border-slate-200/60">
+                {/* Virtualized Grid */}
+                <div className="bg-slate-100/70 p-3 sm:p-4 rounded-3xl border border-slate-200/60">
                   <PdfPageGrid
                     pages={pages}
+                    selectedIds={selectedIds}
+                    onToggleSelect={handleToggleSelect}
                     enableDrag={false}
+                    showRotateButton={false}
+                    showSelectCheckbox={true}
+                    docProxy={docProxy}
+                    docFingerprint={docFingerprint}
                   />
                 </div>
               </div>
@@ -194,9 +272,34 @@ export const SplitPdfPage: React.FC = () => {
                       className="mt-0.5 text-indigo-600"
                     />
                     <div>
-                      <div className="text-sm font-semibold text-slate-800">Custom Ranges</div>
+                      <div className="text-sm font-semibold text-slate-800">Custom Ranges / Selected</div>
                       <div className="text-xs text-slate-500">
-                        Specify exact ranges e.g. 1-3, 5-7
+                        Type ranges or click pages in preview (e.g. 1-3, 5-7)
+                      </div>
+                    </div>
+                  </label>
+
+                  <label
+                    className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-colors ${
+                      mode === 'selected-pages'
+                        ? 'border-indigo-600 bg-indigo-50/40'
+                        : 'border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="split-mode"
+                      checked={mode === 'selected-pages'}
+                      onChange={() => setMode('selected-pages')}
+                      className="mt-0.5 text-indigo-600"
+                    />
+                    <div>
+                      <div className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                        <MousePointerClick className="w-3.5 h-3.5 text-indigo-600" />
+                        <span>Extract Selected Only</span>
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        Combines your {selectedIds.length} clicked pages into one PDF
                       </div>
                     </div>
                   </label>
@@ -250,7 +353,7 @@ export const SplitPdfPage: React.FC = () => {
                 {mode === 'custom-ranges' && (
                   <PageRangeInput
                     value={customRanges}
-                    onChange={setCustomRanges}
+                    onChange={handleCustomRangeChange}
                     totalPages={totalPages}
                     label="Page Ranges to Extract"
                   />
@@ -278,12 +381,22 @@ export const SplitPdfPage: React.FC = () => {
                 <Button
                   size="lg"
                   variant="primary"
-                  leftIcon={<Sparkles className="w-5 h-5" />}
+                  leftIcon={
+                    isDocLoading ? (
+                      <Loader2 className="animate-spin w-5 h-5" />
+                    ) : (
+                      <Sparkles className="w-5 h-5" />
+                    )
+                  }
                   onClick={handleSplit}
-                  disabled={isDocLoading || (mode === 'custom-ranges' && !customRanges.trim())}
+                  disabled={
+                    isDocLoading ||
+                    (mode === 'custom-ranges' && !customRanges.trim()) ||
+                    (mode === 'selected-pages' && selectedIds.length === 0)
+                  }
                   className="w-full"
                 >
-                  Split PDF Now
+                  {isDocLoading ? 'Loading Document...' : 'Split PDF Now'}
                 </Button>
               </div>
             </div>

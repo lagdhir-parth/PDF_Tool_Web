@@ -1,7 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { ChevronRight, ArrowLeft, RotateCcw, ShieldCheck } from 'lucide-react';
-import { Button } from '../common/Button';
+import React from "react";
+import { Link } from "react-router-dom";
+import { ChevronRight, ArrowLeft, RotateCcw } from "lucide-react";
+import { Button } from "../common/Button";
 
 interface ToolLayoutProps {
   title: string;
@@ -27,7 +27,10 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
         <div>
           {/* Breadcrumb */}
           <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
-            <Link to="/" className="hover:text-indigo-600 transition-colors flex items-center gap-1">
+            <Link
+              to="/"
+              className="hover:text-indigo-600 transition-colors flex items-center gap-1"
+            >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>All Tools</span>
             </Link>
@@ -51,13 +54,8 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
           </div>
         </div>
 
-        {/* Actions: Privacy pill & Start Over button */}
+        {/* Actions: Start Over button */}
         <div className="flex items-center gap-3 self-stretch sm:self-auto justify-between sm:justify-end">
-          <div className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-slate-100 text-slate-600">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Local Processing</span>
-          </div>
-
           {hasFiles && onReset && (
             <Button
               variant="outline"

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileOutput, Sparkles, CheckSquare, Square } from 'lucide-react';
+import { FileOutput, Sparkles, CheckSquare, Square, Loader2 } from 'lucide-react';
 import { ToolLayout } from '../../components/layout/ToolLayout';
 import { FileUploader } from '../../components/common/FileUploader';
 import { Button } from '../../components/common/Button';
@@ -18,7 +18,7 @@ export const ExtractPdfPagesPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [rangeStr, setRangeStr] = useState('');
-  const { pages, totalPages, isLoading: isDocLoading } = usePdfDocument(file);
+  const { pages, totalPages, isLoading: isDocLoading, docProxy, docFingerprint } = usePdfDocument(file);
 
   const {
     isProcessing,
@@ -156,11 +156,17 @@ export const ExtractPdfPagesPage: React.FC = () => {
                 <Button
                   variant="primary"
                   size="sm"
-                  leftIcon={<Sparkles className="w-4 h-4" />}
+                  leftIcon={
+                    isDocLoading ? (
+                      <Loader2 className="animate-spin w-4 h-4" />
+                    ) : (
+                      <Sparkles className="w-4 h-4" />
+                    )
+                  }
                   onClick={handleExtract}
                   disabled={selectedIds.length === 0 || isDocLoading}
                 >
-                  Extract to PDF
+                  {isDocLoading ? "Loading Document..." : "Extract to PDF"}
                 </Button>
               </div>
 
@@ -171,6 +177,8 @@ export const ExtractPdfPagesPage: React.FC = () => {
                   selectedIds={selectedIds}
                   onToggleSelect={handleToggleSelect}
                   enableDrag={false}
+                  docProxy={docProxy}
+                  docFingerprint={docFingerprint}
                 />
               </div>
             </div>

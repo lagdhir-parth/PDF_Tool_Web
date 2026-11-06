@@ -6,7 +6,8 @@ import type { PdfMetadata } from '../../types/pdf';
  */
 export async function getPdfMetadata(file: File): Promise<PdfMetadata> {
   const pdfDoc = await loadPdfLibDoc(file);
-  const title = pdfDoc.getTitle();
+
+  const title = pdfDoc.getTitle() || file.name.replace(/\.pdf$/i, '');
   const author = pdfDoc.getAuthor();
   const subject = pdfDoc.getSubject();
   const keywords = pdfDoc.getKeywords();
@@ -16,7 +17,7 @@ export async function getPdfMetadata(file: File): Promise<PdfMetadata> {
   const modificationDate = pdfDoc.getModificationDate();
 
   return {
-    title: title || '',
+    title,
     author: author || '',
     subject: subject || '',
     keywords: keywords || '',

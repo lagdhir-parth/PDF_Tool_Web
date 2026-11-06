@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RotateCw, RotateCcw, Sparkles } from 'lucide-react';
+import { RotateCw, RotateCcw, Sparkles, Loader2 } from 'lucide-react';
 import { ToolLayout } from '../../components/layout/ToolLayout';
 import { FileUploader } from '../../components/common/FileUploader';
 import { Button } from '../../components/common/Button';
@@ -15,7 +15,7 @@ import { sanitizeFilename } from '../../lib/utils/formatting';
 export const RotatePdfPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const { pages, setPages, totalPages, isLoading: isDocLoading } = usePdfDocument(file);
+  const { pages, setPages, totalPages, isLoading: isDocLoading, docProxy, docFingerprint } = usePdfDocument(file);
 
   const {
     isProcessing,
@@ -189,12 +189,18 @@ export const RotatePdfPage: React.FC = () => {
                   <Button
                     variant="primary"
                     size="sm"
-                    leftIcon={<Sparkles className="w-4 h-4" />}
+                    leftIcon={
+                      isDocLoading ? (
+                        <Loader2 className="animate-spin w-4 h-4" />
+                      ) : (
+                        <Sparkles className="w-4 h-4" />
+                      )
+                    }
                     onClick={handleApplyRotate}
-                    disabled={isDocLoading}
+                    disabled={isDocLoading || pages.length === 0}
                     className="ml-2"
                   >
-                    Save & Download
+                    {isDocLoading ? "Loading Document..." : "Save & Download"}
                   </Button>
                 </div>
               </div>
@@ -207,6 +213,8 @@ export const RotatePdfPage: React.FC = () => {
                   onToggleSelect={handleToggleSelect}
                   onRotatePage={(id) => rotatePagesInView(90, [id])}
                   enableDrag={false}
+                  docProxy={docProxy}
+                  docFingerprint={docFingerprint}
                 />
               </div>
             </div>

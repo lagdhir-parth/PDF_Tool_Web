@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, CheckSquare, Square } from 'lucide-react';
+import { Trash2, CheckSquare, Square, Loader2 } from 'lucide-react';
 import { ToolLayout } from '../../components/layout/ToolLayout';
 import { FileUploader } from '../../components/common/FileUploader';
 import { Button } from '../../components/common/Button';
@@ -15,7 +15,7 @@ import { sanitizeFilename } from '../../lib/utils/formatting';
 export const DeletePdfPagesPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const { pages, totalPages, isLoading: isDocLoading } = usePdfDocument(file);
+  const { pages, totalPages, isLoading: isDocLoading, docProxy, docFingerprint } = usePdfDocument(file);
 
   const {
     isProcessing,
@@ -133,11 +133,17 @@ export const DeletePdfPagesPage: React.FC = () => {
                 <Button
                   variant="danger"
                   size="sm"
-                  leftIcon={<Trash2 className="w-4 h-4" />}
+                  leftIcon={
+                    isDocLoading ? (
+                      <Loader2 className="animate-spin w-4 h-4" />
+                    ) : (
+                      <Trash2 className="w-4 h-4" />
+                    )
+                  }
                   onClick={handleDelete}
                   disabled={selectedIds.length === 0 || remainingPages <= 0 || isDocLoading}
                 >
-                  Delete Selected Pages
+                  {isDocLoading ? "Loading Document..." : "Delete Selected Pages"}
                 </Button>
               </div>
 
@@ -148,6 +154,8 @@ export const DeletePdfPagesPage: React.FC = () => {
                   selectedIds={selectedIds}
                   onToggleSelect={handleToggleSelect}
                   enableDrag={false}
+                  docProxy={docProxy}
+                  docFingerprint={docFingerprint}
                 />
               </div>
             </div>

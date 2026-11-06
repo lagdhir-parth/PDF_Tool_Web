@@ -32,14 +32,24 @@ export async function addTextToPdf(
     if (item.pageIndex >= 0 && item.pageIndex < pages.length) {
       const page = pages[item.pageIndex];
       const textColor = hexToRgb(item.color || '#000000');
+      const ascender = font.heightAtSize(item.fontSize, { descender: false });
+
+      // Invert angle for PDF Cartesian coordinate space (Y up) so it matches screen/CSS clockwise rotation
+      const angleInPdf = -(item.rotation || 0);
+      const rad = (angleInPdf * Math.PI) / 180;
+
+      // Rotate around the top-left corner (item.x, item.y) matching CSS transform-origin: left top
+      // Unrotated top-left is at (item.x, item.y); baseline is at (item.x, item.y - ascender)
+      const drawX = item.x + ascender * Math.sin(rad);
+      const drawY = item.y - ascender * Math.cos(rad);
 
       page.drawText(item.text, {
-        x: item.x,
-        y: item.y,
+        x: drawX,
+        y: drawY,
         size: item.fontSize,
         font,
         color: textColor,
-        rotate: degrees(item.rotation || 0),
+        rotate: degrees(angleInPdf),
       });
     }
 

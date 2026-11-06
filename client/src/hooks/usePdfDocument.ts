@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { loadPdfJsDocument, renderPageToThumbnail } from '../lib/pdf/render';
+import type { PDFDocumentProxy } from 'pdfjs-dist';
+import { loadPdfJsDocument } from '../lib/pdf/render';
+import { thumbnailCache } from '../lib/pdf/thumbnail-cache';
 import type { PdfPageItem } from '../types/pdf';
 
 export function usePdfDocument(file: File | null) {
@@ -7,9 +9,12 @@ export function usePdfDocument(file: File | null) {
   const [totalPages, setTotalPages] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [docProxy, setDocProxy] = useState<PDFDocumentProxy | null>(null);
+  const [docFingerprint, setDocFingerprint] = useState<string>('');
 
   useEffect(() => {
     let isCancelled = false;
+    let activeDoc: PDFDocumentProxy | null = null;
 
     async function load() {
       if (!file) {
@@ -17,20 +22,30 @@ export function usePdfDocument(file: File | null) {
         setTotalPages(0);
         setIsLoading(false);
         setError(null);
+        setDocProxy(null);
+        setDocFingerprint('');
         return;
       }
 
       setIsLoading(true);
       setError(null);
 
+      const fingerprint = `${file.name}_${file.size}_${file.lastModified}`;
+      setDocFingerprint(fingerprint);
+
       try {
         const doc = await loadPdfJsDocument(file);
-        if (isCancelled) return;
+        if (isCancelled) {
+          doc.cleanup?.();
+          return;
+        }
 
+        activeDoc = doc;
+        setDocProxy(doc);
         const count = doc.numPages;
         setTotalPages(count);
 
-        // First initialize placeholder items quickly so the UI responds instantly
+        // Fast metadata & structure initialization: immediate responsive UI
         const initialItems: PdfPageItem[] = Array.from({ length: count }, (_, i) => ({
           id: `page_${i + 1}`,
           originalPageIndex: i,
@@ -41,32 +56,31 @@ export function usePdfDocument(file: File | null) {
         }));
 
         setPages(initialItems);
+        // CRITICAL: Document loading is finished! Do not block the UI waiting for all thumbnails.
+        setIsLoading(false);
 
-        // Sequentially render thumbnails without freezing UI
-        for (let i = 1; i <= count; i++) {
-          if (isCancelled) break;
-          try {
-            const thumbUrl = await renderPageToThumbnail(doc, i, 0.35);
-            if (isCancelled) break;
-
-            setPages((prev) =>
-              prev.map((item) =>
-                item.originalPageIndex === i - 1
-                  ? { ...item, thumbnailUrl: thumbUrl }
-                  : item
-              )
-            );
-          } catch (thumbErr) {
-            console.warn(`Failed thumbnail for page ${i}:`, thumbErr);
-          }
+        // Opportunistically generate page 1 thumbnail for instant single-page previews
+        if (count > 0) {
+          thumbnailCache
+            .getOrRenderThumbnail(doc, fingerprint, 1, 0.5)
+            .then((firstThumb) => {
+              if (isCancelled) return;
+              setPages((prev) =>
+                prev.map((item) =>
+                  item.originalPageIndex === 0
+                    ? { ...item, thumbnailUrl: firstThumb }
+                    : item
+                )
+              );
+            })
+            .catch(() => {
+              // Non-blocking thumbnail generation
+            });
         }
       } catch (err: unknown) {
         if (!isCancelled) {
           const msg = err instanceof Error ? err.message : String(err);
           setError(msg);
-        }
-      } finally {
-        if (!isCancelled) {
           setIsLoading(false);
         }
       }
@@ -76,6 +90,9 @@ export function usePdfDocument(file: File | null) {
 
     return () => {
       isCancelled = true;
+      if (activeDoc) {
+        activeDoc.cleanup?.();
+      }
     };
   }, [file]);
 
@@ -85,5 +102,7 @@ export function usePdfDocument(file: File | null) {
     totalPages,
     isLoading,
     error,
+    docProxy,
+    docFingerprint,
   };
 }

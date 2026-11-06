@@ -57,7 +57,7 @@ export async function renderPageToThumbnail(
   // @ts-expect-error pdfjs typing compatibility
   await page.render(renderContext).promise;
 
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  const dataUrl = canvas.toDataURL('image/jpeg', 1);
 
   // Clean up canvas
   canvas.width = 0;

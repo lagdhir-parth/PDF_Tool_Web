@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
-import { Image, ArrowUp, ArrowDown, Trash2, Plus, Sparkles } from 'lucide-react';
-import { ToolLayout } from '../../components/layout/ToolLayout';
-import { FileUploader } from '../../components/common/FileUploader';
-import { Button } from '../../components/common/Button';
-import { ProgressIndicator } from '../../components/common/ProgressIndicator';
-import { ErrorMessage } from '../../components/common/ErrorMessage';
-import { DownloadResult } from '../../components/common/DownloadResult';
-import { imagesToPdf, type PageSizeOption, type PageOrientationOption, type MarginOption } from '../../services/pdf/images-to-pdf';
-import { usePdfProcessing } from '../../hooks/usePdfProcessing';
-import { formatFileSize, sanitizeFilename } from '../../lib/utils/formatting';
-import { IMAGE_ACCEPT } from '../../config/tools';
+import React, { useState } from "react";
+import {
+  Image,
+  Trash2,
+  Plus,
+  Sparkles,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
+import { ToolLayout } from "../../components/layout/ToolLayout";
+import { FileUploader } from "../../components/common/FileUploader";
+import { Button } from "../../components/common/Button";
+import { ProgressIndicator } from "../../components/common/ProgressIndicator";
+import { ErrorMessage } from "../../components/common/ErrorMessage";
+import { DownloadResult } from "../../components/common/DownloadResult";
+import {
+  imagesToPdf,
+  type PageSizeOption,
+  type PageOrientationOption,
+  type MarginOption,
+} from "../../services/pdf/images-to-pdf";
+import { usePdfProcessing } from "../../hooks/usePdfProcessing";
+import { formatFileSize, sanitizeFilename } from "../../lib/utils/formatting";
+import { IMAGE_ACCEPT } from "../../config/tools";
 
 interface ImageFileItem {
   id: string;
@@ -19,10 +31,11 @@ interface ImageFileItem {
 
 export const JpgToPdfPage: React.FC = () => {
   const [images, setImages] = useState<ImageFileItem[]>([]);
-  const [pageSize, setPageSize] = useState<PageSizeOption>('a4');
-  const [orientation, setOrientation] = useState<PageOrientationOption>('portrait');
-  const [margin, setMargin] = useState<MarginOption>('small');
-  const [outputName, setOutputName] = useState('images_converted.pdf');
+  const [pageSize, setPageSize] = useState<PageSizeOption>("a4");
+  const [orientation, setOrientation] =
+    useState<PageOrientationOption>("portrait");
+  const [margin, setMargin] = useState<MarginOption>("small");
+  const [outputName, setOutputName] = useState("images_converted.pdf");
 
   const {
     isProcessing,
@@ -47,9 +60,9 @@ export const JpgToPdfPage: React.FC = () => {
     setImages((prev) => [...prev, ...newItems]);
   };
 
-  const moveImage = (index: number, direction: 'up' | 'down') => {
+  const moveImage = (index: number, direction: "left" | "right") => {
     const newItems = [...images];
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const targetIndex = direction === "left" ? index - 1 : index + 1;
     if (targetIndex >= 0 && targetIndex < newItems.length) {
       const temp = newItems[index];
       newItems[index] = newItems[targetIndex];
@@ -69,7 +82,7 @@ export const JpgToPdfPage: React.FC = () => {
   const handleConvert = async () => {
     if (images.length === 0) return;
     try {
-      startProcessing('Converting images to PDF...');
+      startProcessing("Converting images to PDF...");
       const files = images.map((i) => i.file);
       const pdfBytes = await imagesToPdf(files, {
         pageSize,
@@ -77,7 +90,7 @@ export const JpgToPdfPage: React.FC = () => {
         margin,
         onProgress: updateProgress,
       });
-      const finalName = sanitizeFilename(outputName, 'images_converted.pdf');
+      const finalName = sanitizeFilename(outputName, "images_converted.pdf");
       finishProcessing(pdfBytes, finalName);
     } catch (err) {
       failProcessing(err);
@@ -160,21 +173,21 @@ export const JpgToPdfPage: React.FC = () => {
                         <div className="flex items-center gap-1 shrink-0">
                           <button
                             type="button"
-                            onClick={() => moveImage(index, 'up')}
+                            onClick={() => moveImage(index, "left")}
                             disabled={index === 0}
                             className="p-1 hover:text-indigo-600 disabled:opacity-20 rounded"
                             title="Move left"
                           >
-                            <ArrowUp className="w-3.5 h-3.5" />
+                            <ArrowLeft className="w-3.5 h-3.5" />
                           </button>
                           <button
                             type="button"
-                            onClick={() => moveImage(index, 'down')}
+                            onClick={() => moveImage(index, "right")}
                             disabled={index === images.length - 1}
                             className="p-1 hover:text-indigo-600 disabled:opacity-20 rounded"
                             title="Move right"
                           >
-                            <ArrowDown className="w-3.5 h-3.5" />
+                            <ArrowRight className="w-3.5 h-3.5" />
                           </button>
                           <button
                             type="button"
@@ -212,7 +225,9 @@ export const JpgToPdfPage: React.FC = () => {
 
               {/* Sidebar Settings */}
               <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-5 h-fit">
-                <h3 className="font-bold text-slate-900 text-base">Page Options</h3>
+                <h3 className="font-bold text-slate-900 text-base">
+                  Page Options
+                </h3>
 
                 {/* Page Size */}
                 <div>
@@ -221,7 +236,9 @@ export const JpgToPdfPage: React.FC = () => {
                   </label>
                   <select
                     value={pageSize}
-                    onChange={(e) => setPageSize(e.target.value as PageSizeOption)}
+                    onChange={(e) =>
+                      setPageSize(e.target.value as PageSizeOption)
+                    }
                     className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl bg-white"
                   >
                     <option value="a4">A4 (Standard Document)</option>
@@ -231,7 +248,7 @@ export const JpgToPdfPage: React.FC = () => {
                 </div>
 
                 {/* Orientation */}
-                {pageSize !== 'fit' && (
+                {pageSize !== "fit" && (
                   <div>
                     <label className="text-xs font-semibold text-slate-700 block mb-1.5">
                       Orientation
@@ -239,22 +256,22 @@ export const JpgToPdfPage: React.FC = () => {
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
-                        onClick={() => setOrientation('portrait')}
+                        onClick={() => setOrientation("portrait")}
                         className={`py-2 text-xs font-medium rounded-xl border transition-colors ${
-                          orientation === 'portrait'
-                            ? 'border-indigo-600 bg-indigo-50 text-indigo-700 font-semibold'
-                            : 'border-slate-200 hover:bg-slate-50'
+                          orientation === "portrait"
+                            ? "border-indigo-600 bg-indigo-50 text-indigo-700 font-semibold"
+                            : "border-slate-200 hover:bg-slate-50"
                         }`}
                       >
                         Portrait
                       </button>
                       <button
                         type="button"
-                        onClick={() => setOrientation('landscape')}
+                        onClick={() => setOrientation("landscape")}
                         className={`py-2 text-xs font-medium rounded-xl border transition-colors ${
-                          orientation === 'landscape'
-                            ? 'border-indigo-600 bg-indigo-50 text-indigo-700 font-semibold'
-                            : 'border-slate-200 hover:bg-slate-50'
+                          orientation === "landscape"
+                            ? "border-indigo-600 bg-indigo-50 text-indigo-700 font-semibold"
+                            : "border-slate-200 hover:bg-slate-50"
                         }`}
                       >
                         Landscape

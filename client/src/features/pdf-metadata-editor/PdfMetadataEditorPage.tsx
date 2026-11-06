@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
-import { FileText, Sparkles, Calendar, User, BookOpen, Key, Info } from 'lucide-react';
-import { ToolLayout } from '../../components/layout/ToolLayout';
-import { FileUploader } from '../../components/common/FileUploader';
-import { Button } from '../../components/common/Button';
-import { ProgressIndicator } from '../../components/common/ProgressIndicator';
-import { ErrorMessage } from '../../components/common/ErrorMessage';
-import { DownloadResult } from '../../components/common/DownloadResult';
-import { getPdfMetadata, updatePdfMetadata } from '../../services/pdf/metadata';
-import { usePdfProcessing } from '../../hooks/usePdfProcessing';
-import type { PdfMetadata } from '../../types/pdf';
-import { sanitizeFilename } from '../../lib/utils/formatting';
+import React, { useState } from "react";
+import {
+  FileText,
+  Sparkles,
+  Calendar,
+  User,
+  BookOpen,
+  Key,
+  Info,
+  Loader2,
+} from "lucide-react";
+import { ToolLayout } from "../../components/layout/ToolLayout";
+import { FileUploader } from "../../components/common/FileUploader";
+import { Button } from "../../components/common/Button";
+import { ProgressIndicator } from "../../components/common/ProgressIndicator";
+import { ErrorMessage } from "../../components/common/ErrorMessage";
+import { DownloadResult } from "../../components/common/DownloadResult";
+import { getPdfMetadata, updatePdfMetadata } from "../../services/pdf/metadata";
+import { usePdfProcessing } from "../../hooks/usePdfProcessing";
+import type { PdfMetadata } from "../../types/pdf";
+import { sanitizeFilename } from "../../lib/utils/formatting";
 
 export const PdfMetadataEditorPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -39,7 +48,7 @@ export const PdfMetadataEditorPage: React.FC = () => {
         const meta = await getPdfMetadata(selected);
         setMetadata(meta);
       } catch (err) {
-        console.warn('Could not read metadata:', err);
+        console.warn("Could not read metadata:", err);
       } finally {
         setIsLoadingMeta(false);
       }
@@ -49,9 +58,16 @@ export const PdfMetadataEditorPage: React.FC = () => {
   const handleSaveMetadata = async () => {
     if (!file) return;
     try {
-      startProcessing('Writing metadata changes...');
-      const resultBytes = await updatePdfMetadata(file, metadata, updateProgress);
-      const finalName = sanitizeFilename(`metadata_${file.name}`, 'updated.pdf');
+      startProcessing("Writing metadata changes...");
+      const resultBytes = await updatePdfMetadata(
+        file,
+        metadata,
+        updateProgress,
+      );
+      const finalName = sanitizeFilename(
+        `metadata_${file.name}`,
+        "updated.pdf",
+      );
       finishProcessing(resultBytes, finalName);
     } catch (err) {
       failProcessing(err);
@@ -97,7 +113,9 @@ export const PdfMetadataEditorPage: React.FC = () => {
             <div className="max-w-3xl mx-auto bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm space-y-6">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
-                  <h3 className="font-bold text-slate-900 text-lg">Document Information</h3>
+                  <h3 className="font-bold text-slate-900 text-lg">
+                    Document Information
+                  </h3>
                   <p className="text-xs text-slate-500">{file.name}</p>
                 </div>
                 {isLoadingMeta && (
@@ -116,8 +134,10 @@ export const PdfMetadataEditorPage: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={metadata.title || ''}
-                    onChange={(e) => setMetadata({ ...metadata, title: e.target.value })}
+                    value={metadata.title || ""}
+                    onChange={(e) =>
+                      setMetadata({ ...metadata, title: e.target.value })
+                    }
                     placeholder="Document title"
                     className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl"
                   />
@@ -131,8 +151,10 @@ export const PdfMetadataEditorPage: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={metadata.author || ''}
-                    onChange={(e) => setMetadata({ ...metadata, author: e.target.value })}
+                    value={metadata.author || ""}
+                    onChange={(e) =>
+                      setMetadata({ ...metadata, author: e.target.value })
+                    }
                     placeholder="Author name"
                     className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl"
                   />
@@ -146,8 +168,10 @@ export const PdfMetadataEditorPage: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={metadata.subject || ''}
-                    onChange={(e) => setMetadata({ ...metadata, subject: e.target.value })}
+                    value={metadata.subject || ""}
+                    onChange={(e) =>
+                      setMetadata({ ...metadata, subject: e.target.value })
+                    }
                     placeholder="Summary or subject"
                     className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl"
                   />
@@ -161,8 +185,10 @@ export const PdfMetadataEditorPage: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={metadata.keywords || ''}
-                    onChange={(e) => setMetadata({ ...metadata, keywords: e.target.value })}
+                    value={metadata.keywords || ""}
+                    onChange={(e) =>
+                      setMetadata({ ...metadata, keywords: e.target.value })
+                    }
                     placeholder="e.g. invoice, report, 2026"
                     className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl"
                   />
@@ -175,8 +201,10 @@ export const PdfMetadataEditorPage: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={metadata.creator || ''}
-                    onChange={(e) => setMetadata({ ...metadata, creator: e.target.value })}
+                    value={metadata.creator || ""}
+                    onChange={(e) =>
+                      setMetadata({ ...metadata, creator: e.target.value })
+                    }
                     className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl"
                   />
                 </div>
@@ -188,8 +216,10 @@ export const PdfMetadataEditorPage: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={metadata.producer || ''}
-                    onChange={(e) => setMetadata({ ...metadata, producer: e.target.value })}
+                    value={metadata.producer || ""}
+                    onChange={(e) =>
+                      setMetadata({ ...metadata, producer: e.target.value })
+                    }
                     className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl"
                   />
                 </div>
@@ -217,10 +247,17 @@ export const PdfMetadataEditorPage: React.FC = () => {
                 <Button
                   size="lg"
                   variant="primary"
-                  leftIcon={<Sparkles className="w-5 h-5" />}
+                  leftIcon={
+                    isLoadingMeta ? (
+                      <Loader2 className="animate-spin w-5 h-5" />
+                    ) : (
+                      <Sparkles className="w-5 h-5" />
+                    )
+                  }
                   onClick={handleSaveMetadata}
+                  disabled={isLoadingMeta}
                 >
-                  Save Metadata & Download
+                  {isLoadingMeta ? "Reading Properties..." : "Save Metadata & Download"}
                 </Button>
               </div>
             </div>

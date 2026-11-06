@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   LayoutGrid,
   RotateCw,
@@ -9,23 +9,24 @@ import {
   Sparkles,
   CheckSquare,
   Square,
-} from 'lucide-react';
-import { ToolLayout } from '../../components/layout/ToolLayout';
-import { FileUploader } from '../../components/common/FileUploader';
-import { Button } from '../../components/common/Button';
-import { ProgressIndicator } from '../../components/common/ProgressIndicator';
-import { ErrorMessage } from '../../components/common/ErrorMessage';
-import { DownloadResult } from '../../components/common/DownloadResult';
-import { PdfPageGrid } from '../../components/pdf/PdfPageGrid';
-import { organizePdf } from '../../services/pdf/organize';
-import { usePdfProcessing } from '../../hooks/usePdfProcessing';
-import { usePdfDocument } from '../../hooks/usePdfDocument';
-import { useEditorStore } from '../../stores/editor.store';
-import { sanitizeFilename } from '../../lib/utils/formatting';
+  Loader2,
+} from "lucide-react";
+import { ToolLayout } from "../../components/layout/ToolLayout";
+import { FileUploader } from "../../components/common/FileUploader";
+import { Button } from "../../components/common/Button";
+import { ProgressIndicator } from "../../components/common/ProgressIndicator";
+import { ErrorMessage } from "../../components/common/ErrorMessage";
+import { DownloadResult } from "../../components/common/DownloadResult";
+import { PdfPageGrid } from "../../components/pdf/PdfPageGrid";
+import { organizePdf } from "../../services/pdf/organize";
+import { usePdfProcessing } from "../../hooks/usePdfProcessing";
+import { usePdfDocument } from "../../hooks/usePdfDocument";
+import { useEditorStore } from "../../stores/editor.store";
+import { sanitizeFilename } from "../../lib/utils/formatting";
 
 export const OrganizePdfPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
-  const { pages: docPages, isLoading: isDocLoading } = usePdfDocument(file);
+  const { pages: docPages, isLoading: isDocLoading, docProxy, docFingerprint } = usePdfDocument(file);
 
   const {
     pages,
@@ -36,6 +37,7 @@ export const OrganizePdfPage: React.FC = () => {
     selectAll,
     clearSelection,
     rotateSelected,
+    rotatePage,
     deleteSelected,
     duplicateSelected,
     undo,
@@ -70,14 +72,21 @@ export const OrganizePdfPage: React.FC = () => {
   useEffect(() => {
     if (docPages.length > 0 && pages.length > 0) {
       const needsUpdate = pages.some(
-        (p) => !p.thumbnailUrl && docPages.find((dp) => dp.originalPageIndex === p.originalPageIndex)?.thumbnailUrl
+        (p) =>
+          !p.thumbnailUrl &&
+          docPages.find((dp) => dp.originalPageIndex === p.originalPageIndex)
+            ?.thumbnailUrl,
       );
       if (needsUpdate) {
         setPages(
           pages.map((p) => {
-            const match = docPages.find((dp) => dp.originalPageIndex === p.originalPageIndex);
-            return match && match.thumbnailUrl ? { ...p, thumbnailUrl: match.thumbnailUrl } : p;
-          })
+            const match = docPages.find(
+              (dp) => dp.originalPageIndex === p.originalPageIndex,
+            );
+            return match && match.thumbnailUrl
+              ? { ...p, thumbnailUrl: match.thumbnailUrl }
+              : p;
+          }),
         );
       }
     }
@@ -92,12 +101,15 @@ export const OrganizePdfPage: React.FC = () => {
   const handleOrganizeSave = async () => {
     if (!file || pages.length === 0) return;
     try {
-      startProcessing('Assembling organized PDF...');
+      startProcessing("Assembling organized PDF...");
       const resultBytes = await organizePdf(file, {
         pages,
         onProgress: updateProgress,
       });
-      const finalName = sanitizeFilename(`organized_${file.name}`, 'organized.pdf');
+      const finalName = sanitizeFilename(
+        `organized_${file.name}`,
+        "organized.pdf",
+      );
       finishProcessing(resultBytes, finalName);
     } catch (err) {
       failProcessing(err);
@@ -152,10 +164,22 @@ export const OrganizePdfPage: React.FC = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    leftIcon={selectedIds.length === pages.length ? <Square className="w-4 h-4" /> : <CheckSquare className="w-4 h-4" />}
-                    onClick={selectedIds.length === pages.length ? clearSelection : selectAll}
+                    leftIcon={
+                      selectedIds.length === pages.length ? (
+                        <Square className="w-4 h-4" />
+                      ) : (
+                        <CheckSquare className="w-4 h-4" />
+                      )
+                    }
+                    onClick={
+                      selectedIds.length === pages.length
+                        ? clearSelection
+                        : selectAll
+                    }
                   >
-                    {selectedIds.length === pages.length ? 'Deselect All' : 'Select All'}
+                    {selectedIds.length === pages.length
+                      ? "Deselect All"
+                      : "Select All"}
                   </Button>
 
                   <span className="text-xs text-slate-400 font-medium">|</span>
@@ -197,7 +221,9 @@ export const OrganizePdfPage: React.FC = () => {
                     Delete
                   </Button>
 
-                  <span className="text-xs text-slate-400 font-medium hidden sm:inline">|</span>
+                  <span className="text-xs text-slate-400 font-medium hidden sm:inline">
+                    |
+                  </span>
 
                   <button
                     type="button"
@@ -222,12 +248,20 @@ export const OrganizePdfPage: React.FC = () => {
                   <Button
                     variant="primary"
                     size="sm"
-                    leftIcon={<Sparkles className="w-4 h-4" />}
+                    leftIcon={
+                      isDocLoading ? (
+                        <Loader2 className="animate-spin w-4 h-4" />
+                      ) : (
+                        <Sparkles className="w-4 h-4" />
+                      )
+                    }
                     onClick={handleOrganizeSave}
                     disabled={pages.length === 0 || isDocLoading}
                     className="ml-2"
                   >
-                    Save & Download PDF
+                    {isDocLoading
+                      ? "Loading Document..."
+                      : "Save & Download PDF"}
                   </Button>
                 </div>
               </div>
@@ -238,12 +272,11 @@ export const OrganizePdfPage: React.FC = () => {
                   pages={pages}
                   selectedIds={selectedIds}
                   onToggleSelect={toggleSelectPage}
-                  onRotatePage={(id) => {
-                    toggleSelectPage(id);
-                    rotateSelected(90);
-                  }}
+                  onRotatePage={(id) => rotatePage(id, 90)}
                   onReorderPages={reorderPages}
                   enableDrag={true}
+                  docProxy={docProxy}
+                  docFingerprint={docFingerprint}
                 />
               </div>
             </div>

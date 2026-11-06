@@ -14,6 +14,7 @@ interface EditorState {
   selectAll: () => void;
   clearSelection: () => void;
   rotateSelected: (delta: 90 | 180 | 270) => void;
+  rotatePage: (id: string, delta?: 90 | 180 | 270) => void;
   deleteSelected: () => void;
   duplicateSelected: () => void;
   undo: () => void;
@@ -75,6 +76,27 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
     const newPages = pages.map((p) => {
       if (selectedIds.includes(p.id)) {
+        return {
+          ...p,
+          rotation: ((p.rotation + delta) % 360 + 360) % 360,
+        };
+      }
+      return p;
+    });
+
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push(newPages);
+    set({
+      pages: newPages,
+      history: newHistory,
+      historyIndex: newHistory.length - 1,
+    });
+  },
+
+  rotatePage: (id, delta = 90) => {
+    const { pages, history, historyIndex } = get();
+    const newPages = pages.map((p) => {
+      if (p.id === id) {
         return {
           ...p,
           rotation: ((p.rotation + delta) % 360 + 360) % 360,

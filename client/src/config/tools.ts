@@ -35,6 +35,17 @@ export const TOOLS: ToolConfig[] = [
     featured: true,
   },
   {
+    id: 'extract-pdf-pages',
+    title: 'Extract PDF Pages',
+    shortTitle: 'Extract Pages',
+    description: 'Create a new standalone PDF containing only the selected individual or range of pages.',
+    category: 'organize',
+    path: '/extract-pdf-pages',
+    iconName: 'FileOutput',
+    accept: PDF_ACCEPT,
+    maxFiles: 1,
+  },
+  {
     id: 'jpg-to-pdf',
     title: 'JPG / PNG to PDF',
     shortTitle: 'JPG to PDF',
@@ -101,17 +112,7 @@ export const TOOLS: ToolConfig[] = [
     accept: PDF_ACCEPT,
     maxFiles: 1,
   },
-  {
-    id: 'extract-pdf-pages',
-    title: 'Extract PDF Pages',
-    shortTitle: 'Extract Pages',
-    description: 'Create a new standalone PDF containing only the selected individual or range of pages.',
-    category: 'organize',
-    path: '/extract-pdf-pages',
-    iconName: 'FileOutput',
-    accept: PDF_ACCEPT,
-    maxFiles: 1,
-  },
+
   {
     id: 'add-text-to-pdf',
     title: 'Add Text Overlays',

@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
   Files,
   Scissors,
@@ -19,8 +19,8 @@ import {
   Lock,
   ArrowRight,
   Sparkles,
-} from 'lucide-react';
-import { TOOLS } from '../config/tools';
+} from "lucide-react";
+import { TOOLS } from "../config/tools";
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   Files: <Files className="w-6 h-6" />,
@@ -38,15 +38,15 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 };
 
 export const HomePage: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const categories = [
-    { id: 'all', label: 'All 12 Tools' },
-    { id: 'organize', label: 'Organize' },
-    { id: 'convert', label: 'Convert' },
-    { id: 'edit', label: 'Edit' },
-    { id: 'forms', label: 'Forms' },
+    { id: "all", label: "All 12 Tools" },
+    { id: "organize", label: "Organize" },
+    { id: "convert", label: "Convert" },
+    { id: "edit", label: "Edit" },
+    { id: "forms", label: "Forms" },
   ];
 
   const filteredTools = useMemo(() => {
@@ -55,7 +55,7 @@ export const HomePage: React.FC = () => {
         tool.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tool.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory =
-        selectedCategory === 'all' || tool.category === selectedCategory;
+        selectedCategory === "all" || tool.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, selectedCategory]);
@@ -64,22 +64,17 @@ export const HomePage: React.FC = () => {
     <div className="space-y-16 animate-in fade-in duration-300">
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-12 pb-8 sm:pt-20 sm:pb-12 text-center max-w-4xl mx-auto px-4">
-        {/* Privacy Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-xs font-semibold mb-6 shadow-2xs">
-          <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>100% Client-Side • Your Files Never Leave This Device</span>
-        </div>
-
         {/* Main Heading */}
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.15] mb-5">
-          Every PDF Tool You Need.{' '}
-          <span className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600 bg-clip-text text-transparent block sm:inline">
+          Every PDF Tool You Need.{" "}
+          <span className="text-indigo-600 block sm:inline">
             100% Free & Private.
           </span>
         </h1>
 
         <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-          Merge, split, rotate, watermark, convert, and edit PDF documents locally in your browser with zero server uploads and unmatched speed.
+          Merge, split, rotate, watermark, convert, and edit PDF documents
+          locally in your browser with zero server uploads and unmatched speed.
         </p>
 
         {/* Search Bar */}
@@ -103,8 +98,8 @@ export const HomePage: React.FC = () => {
               onClick={() => setSelectedCategory(cat.id)}
               className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
                 selectedCategory === cat.id
-                  ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                  : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80'
+                  ? "bg-indigo-600 text-white shadow-sm shadow-indigo-600/30"
+                  : "bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80"
               }`}
             >
               {cat.label}
@@ -125,7 +120,9 @@ export const HomePage: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-200 shadow-2xs">
-                    {ICON_MAP[tool.iconName] || <FileText className="w-6 h-6" />}
+                    {ICON_MAP[tool.iconName] || (
+                      <FileText className="w-6 h-6" />
+                    )}
                   </div>
 
                   {tool.badge && (
@@ -166,8 +163,8 @@ export const HomePage: React.FC = () => {
             </p>
             <button
               onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('all');
+                setSearchQuery("");
+                setSelectedCategory("all");
               }}
               className="mt-4 text-xs font-semibold text-indigo-600 hover:underline"
             >
@@ -191,7 +188,10 @@ export const HomePage: React.FC = () => {
             </h2>
 
             <p className="text-slate-300 text-sm leading-relaxed mb-8">
-              Most online PDF converters upload your confidential contracts, financial statements, and sensitive personal files to unknown third-party servers. PDFStudio runs entirely on your local machine using standard WebAssembly and Canvas APIs.
+              Most online PDF converters upload your confidential contracts,
+              financial statements, and sensitive personal files to unknown
+              third-party servers. PDFStudio runs entirely on your local machine
+              using standard WebAssembly and Canvas APIs.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -201,7 +201,8 @@ export const HomePage: React.FC = () => {
                 </div>
                 <h4 className="font-bold text-sm">Complete Privacy</h4>
                 <p className="text-xs text-slate-400">
-                  Document bytes never leave your memory buffer. No logs, no telemetry on files.
+                  Document bytes never leave your memory buffer. No logs, no
+                  telemetry on files.
                 </p>
               </div>
 
@@ -211,7 +212,8 @@ export const HomePage: React.FC = () => {
                 </div>
                 <h4 className="font-bold text-sm">Blazing Fast</h4>
                 <p className="text-xs text-slate-400">
-                  Zero upload/download bandwidth bottlenecks. Instant processing powered by your CPU.
+                  Zero upload/download bandwidth bottlenecks. Instant processing
+                  powered by your CPU.
                 </p>
               </div>
 
@@ -221,7 +223,8 @@ export const HomePage: React.FC = () => {
                 </div>
                 <h4 className="font-bold text-sm">Unlimited & Free</h4>
                 <p className="text-xs text-slate-400">
-                  No paywalls, subscriptions, or daily limits. Process documents anytime.
+                  No paywalls, subscriptions, or daily limits. Process documents
+                  anytime.
                 </p>
               </div>
             </div>
